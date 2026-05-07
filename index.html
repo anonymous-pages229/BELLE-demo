@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Bayesian Speech Synthesisers Can Learn from Multiple Teachers">
+  <meta name="keywords" content="Bayesian, Speech Synthesis, Multi-Teacher Learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bayesian Speech Synthesisers Can Learn from Multiple Teachers</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
+  <style>
+    .section {
+      padding-top: 1.5rem !important;
+      padding-bottom: 1.5rem !important;
+    } 
+    .center-flex {            /* 根据需要调整 */
+    display: flex;
+    align-items: center;         /* 垂直居中 */
+    justify-content: center;     /* 水平居中 */
+    text-align: center;
+    height: 100%;
+    }
+    td {
+      height: 60px;
+      vertical-align: middle;
+      padding: 2px 4px;
+      text-align: center;
+    }
+    .audio-wrapper {
+      display: flex;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中，可选 */
+      height: 25%;
+    }
+    .audio-wrapper audio {
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+      height: 20px;
+      min-height: 20px;
+      max-width: 150px;
+    }
+    .table-intro {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    .table td img {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.18s ease;
+    }
+    .table td img:hover {
+    z-index: 99;
+    transform: scale(3.0);
+    }
+    .intro-label {
+      font-weight: 500;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .intro-image-block {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .intro-image-title {
+      font-size: 0.98em;
+      color: #666;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+    .intro-image {
+      width: 100%;
+      height: auto;
+      max-width: 1000px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 8px;
+      background: #f8f8f8;
+    }
+    .model-title {
+      margin-top: 18px;
+    }
+  </style>
+  <!-- 可选: 引入Google Analytics -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR-ID"></script> -->
+  <!-- <script> ... </script> -->
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <!--link rel="stylesheet" href="./static/css/fontawesome.all.min.css"-->
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!--script defer src="./static/js/fontawesome.all.min.js"></script-->
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+  
+  <section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-1 publication-title">
+        Bayesian Speech Synthesisers Can Learn from Multiple Teachers
+      </h1>
+      <div class="is-size-5 publication-authors">
+        <span class="author-block">
+          <a href="#">Anonymous Author(s)</a>
+        </span>
+      </div>
+      <div class="is-size-5 publication-authors">
+        <span class="author-block">Anonymous Institution(s)
+        </span>
+      </div>
+      <div class="is-size-6" style="margin-top:6px;">
+        <em>Anonymous submission for review</em>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div style="max-width: 900px; margin: 0 auto 24px auto; font-size: 1.08em; color: #444;">
+      Text-to-Speech (TTS) is inherently a "one-to-many" mapping characterized by intrinsic uncertainty, yet current paradigms often oversimplify it into a deterministic regression task. While continuous-valued autoregressive (AR) models have recently emerged as a promising alternative to discrete codec-based approaches, they typically rely on a fixed-variance prior, fundamentally constraining generation to a static point estimate that ignores the dynamic variability of natural speech. To bridge this gap, we propose BELLE (Bayesian evidential learning with language modelling), a framework that shifts from deterministic prediction to principled Bayesian inference without increasing model parameters or inference latency. By modeling the acoustic target as a Normal-Inverse-Gamma distribution, BELLE captures data-dependent aleatoric uncertainty. To enable accurate variance estimation on standard single-reference datasets, we introduce a "one-to-many" training strategy that leverages synthetic samples as a statistical support set, allowing the model to learn robust distributional properties rather than merely imitating teacher artifacts. Experiments demonstrate that BELLE, trained on only ~5k hours of data, outperforms leading open-source models trained on 50k hours (achieving a 25.8% relative WER reduction) and naturally supports high-quality streaming generation.
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="table-intro">
+      <h2 class="title is-3 has-text-centered">Data Pipeline &amp; Model</h2>
+      <div class="intro-image-block">
+        <!-- 可添加介绍文字 -->
+        <img src="belle.png" alt="数据示例" class="intro-image">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Text-to-Speech Generation Comparison</h2>
+    <table class="table is-striped is-hoverable is-fullwidth has-text-centered" style="table-layout: fixed;">
+      <tbody>
+        <!-- 第一组 -->
+        <tr>
+          <td colspan="6" style="height: 30px; vertical-align: middle;">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: flex-start;">
+              <strong>Text 1: when she used to tell me about him i always wondered whether she wasn't a little in love with him</strong>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="width:16.67%;">
+            <div>GroundTruth</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/groundtruth/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td style="width:16.67%;">
+            <div>MaskGCT</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/maskgct/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td style="width:16.67%;">
+            <div>F5-TTS</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/f5tts/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td style="width:16.67%;">
+            <div>MELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/melle/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td style="width:16.67%;">
+            <div>BELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td style="width:16.67%;">
+            <div>BELLE Stream</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle_stream/237-134500-0022_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+        </tr>
+        <!-- 第二组 -->
+        <tr>
+          <td colspan="6" style="height: 30px; vertical-align: middle;">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: flex-start;">
+              <strong>Text 2: there was a unanimous groan at this and much reproach after which in his preoccupied way he explained</strong>
+            </div>              
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div>GroundTruth</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/groundtruth/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>MaskGCT</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/maskgct/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>F5-TTS</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/f5tts/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>MELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/melle/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>BELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>BELLE Stream</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle_stream/121-127105-0003_wav_pg_0.wav"></audio>
+            </div>
+          </td>
+        </tr>
+        <!-- 第三组 -->
+        <tr>
+          <td colspan="6" style="height: 30px; vertical-align: middle;">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: flex-start;">
+              <strong>Text 3: we will go out together to the bower there is a way down to the court from my window</strong>
+            </div>    
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div>GroundTruth</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/groundtruth/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>MaskGCT</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/maskgct/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>F5-TTS</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/f5tts/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>MELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/melle/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>BELLE</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+          <td>
+            <div>BELLE Stream</div>
+            <div class="audio-wrapper">
+              <audio controls src="./static/audio_new/belle_stream/61-70970-0016_wav_pg_2.wav"></audio>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 这里可以加你的正文内容，例如demo播放器介绍等 -->
+
+</body>
+</html>

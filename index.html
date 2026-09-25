@@ -522,9 +522,9 @@
       </h1>
 
       <p class="subtitle">
-        BELLE shifts continuous-valued autoregressive TTS from deterministic regression to principled
-        Bayesian inference — modelling each acoustic step as a Normal-Inverse-Gamma distribution
-        and capturing the dynamic variability of natural speech, with no extra parameters or latency.
+        BELLE is a continuous-valued autoregressive TTS model that places a Bayesian prior over the
+        mean and variance of every mel-spectrogram frame and predicts it from the input, so the spread
+        of the speech it generates changes with what is being said.
       </p>
 
       <div class="meta-row">
@@ -578,19 +578,16 @@
       <div class="abstract-grid">
         <aside class="abstract-side">
           <div class="kv"><span class="k">PRIOR</span><span class="v">Normal-Inverse-Gamma</span></div>
-          <div class="kv"><span class="k">PARAMS</span><span class="v">μ, ν, α, β</span></div>
-          <div class="kv"><span class="k">CORPORA</span><span class="v">MultiVox · LibriSpeech+6TTS</span></div>
+          <div class="kv"><span class="k">PARAMS</span><span class="v">γ, ν, α, β</span></div>
+          <div class="kv"><span class="k">CORPORA</span><span class="v">ParallelVox · LS+6TTS</span></div>
           <div class="kv"><span class="k">REGIME</span><span class="v">One-to-many AR</span></div>
         </aside>
 
         <div class="abstract-body">
-          <p>Text-to-Speech (TTS) is inherently a <em>one-to-many</em> mapping characterized by intrinsic uncertainty, yet current paradigms often oversimplify it into a deterministic regression task. While continuous-valued autoregressive (AR) models have recently emerged as a promising alternative to discrete codec-based approaches, they typically rely on a fixed-variance prior, fundamentally constraining generation to a static point estimate that ignores the dynamic variability of natural speech.</p>
-
-          <p>To bridge this gap, we propose <strong>BELLE</strong> (<strong>B</strong>ayesian <strong>e</strong>vidential <strong>l</strong>earning with <strong>l</strong>anguag<strong>e</strong> modelling), a framework that shifts from deterministic prediction to principled Bayesian inference without increasing model parameters or inference latency. By modelling the acoustic target as a <strong>Normal-Inverse-Gamma</strong> distribution, BELLE captures data-dependent aleatoric uncertainty.</p>
-
-          <p>Variance estimation under this prior, however, requires multiple speech realizations per text, motivating a <em>one-to-many</em> training strategy that treats parallel speech as a statistical support set rather than imitation targets. Two parallel-speech corpora are constructed for this purpose — <strong>MultiVox</strong>, assembled from real human recordings, and <strong>LibriSpeech+6TTS</strong>, synthesized by six pre-trained TTS teachers — and BELLE learns within-prompt diversity from either source.</p>
-
-          <p>Across both corpora, BELLE consistently outperforms deterministic baselines on quality, speaker similarity, and within-prompt diversity, and the framework extends naturally to streaming generation.</p>
+          <p>Text-to-speech (TTS) is a <em>one-to-many</em> problem: one text can be spoken in many valid ways, so its realizations form a distribution whose spread depends on the input. Most TTS models do not model this spread explicitly: they leave it implicit in the sampling process or fix it in advance.</p>
+          <p>To model this distribution explicitly, we propose <strong>BELLE</strong> (<strong>B</strong>ayesian <strong>e</strong>vidential <strong>l</strong>earning with <strong>l</strong>anguag<strong>e</strong> modelling), which places a Bayesian prior over the mean and variance of each mel-spectrogram frame and predicts this prior from the input, while keeping the architecture and single-pass sampling of common continuous-valued autoregressive TTS models such as MELLE.</p>
+          <p>Estimating this variance requires several recordings of each text, whereas standard TTS corpora provide one. We therefore construct two parallel-speech corpora: <strong>ParallelVox</strong> from real human recordings and <strong>LS+6TTS</strong>, which adds speech from six pre-trained TTS teachers to LibriSpeech (LS).</p>
+          <p>Trained on these corpora, BELLE outperforms MELLE under the same training conditions, is competitive with larger TTS systems on the objective metrics of LibriSpeech test-clean, and supports streaming generation. Analyses of repeated human readings show that real speech has the properties the Bayesian prior assumes and that the variance predicted by BELLE follows the variation across these readings. Parallel speech improves BELLE, and synthetic parallel speech performs comparably to real parallel speech at the same volume and is far easier to scale.</p>
         </div>
       </div>
     </div>
@@ -602,12 +599,12 @@
       <div class="section-head">
         <div class="section-num">02 · Method</div>
         <h2 class="section-title">Data pipeline &amp; model architecture.</h2>
-        <p class="section-sub">Parallel speech serves as a statistical support set; the acoustic head emits the four parameters of a Normal-Inverse-Gamma distribution at every step.</p>
+        <p class="section-sub">Several realizations of each text provide the statistical support for estimating the variance; the Sampling Module predicts the four parameters of a Normal-Inverse-Gamma prior at every frame and samples the frame from it in a single pass.</p>
       </div>
 
       <div class="figure">
         <img src="belle.png" alt="BELLE: data pipeline and model architecture overview">
-        <p class="figure-cap"><b>FIG.01</b>&nbsp;&nbsp;Overview of BELLE. Multiple speech realizations per prompt are aggregated into a support set; the AR backbone emits NIG parameters that jointly produce a point estimate and a calibrated variance.</p>
+        <p class="figure-cap"><b>FIG.01</b>&nbsp;&nbsp;Overview of BELLE. Several realizations of each text form the training targets; the AR backbone predicts the NIG parameters of each frame, which set both its location and its spread.</p>
       </div>
     </div>
   </section>
@@ -618,7 +615,7 @@
       <div class="section-head">
         <div class="section-num">03 · Samples</div>
         <h2 class="section-title">Listening comparison.</h2>
-        <p class="section-sub">Three prompts from LibriSpeech, generated zero-shot. BELLE is compared against the deterministic AR baseline (MELLE) and the corresponding human reference.</p>
+        <p class="section-sub">Three sentences from LibriSpeech test-clean, generated zero-shot from a speech prompt. BELLE and BELLE-stream are compared with MELLE, which samples each frame from a Gaussian whose variance is pulled toward a fixed value, and with the human recording.</p>
       </div>
 
       <!-- Sample 1 -->
@@ -635,7 +632,7 @@
           </div>
           <div class="audio-cell">
             <div class="audio-head-row"><span class="audio-name">MELLE</span><span class="audio-badge">Baseline</span></div>
-            <div class="audio-tag">deterministic AR</div>
+            <div class="audio-tag">fixed-variance Gaussian AR</div>
             <audio controls preload="none" src="./static/audio_new/melle/237-134500-0022_wav_pg_2.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
@@ -644,7 +641,7 @@
             <audio controls preload="none" src="./static/audio_new/belle/237-134500-0022_wav_pg_2.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
-            <div class="audio-head-row"><span class="audio-name">BELLE Stream</span><span class="audio-badge">Ours</span></div>
+            <div class="audio-head-row"><span class="audio-name">BELLE-stream</span><span class="audio-badge">Ours</span></div>
             <div class="audio-tag">streaming variant</div>
             <audio controls preload="none" src="./static/audio_new/belle_stream/237-134500-0022_wav_pg_2.wav"></audio>
           </div>
@@ -665,7 +662,7 @@
           </div>
           <div class="audio-cell">
             <div class="audio-head-row"><span class="audio-name">MELLE</span><span class="audio-badge">Baseline</span></div>
-            <div class="audio-tag">deterministic AR</div>
+            <div class="audio-tag">fixed-variance Gaussian AR</div>
             <audio controls preload="none" src="./static/audio_new/melle/121-127105-0003_wav_pg_0.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
@@ -674,7 +671,7 @@
             <audio controls preload="none" src="./static/audio_new/belle/121-127105-0003_wav_pg_0.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
-            <div class="audio-head-row"><span class="audio-name">BELLE Stream</span><span class="audio-badge">Ours</span></div>
+            <div class="audio-head-row"><span class="audio-name">BELLE-stream</span><span class="audio-badge">Ours</span></div>
             <div class="audio-tag">streaming variant</div>
             <audio controls preload="none" src="./static/audio_new/belle_stream/121-127105-0003_wav_pg_0.wav"></audio>
           </div>
@@ -695,7 +692,7 @@
           </div>
           <div class="audio-cell">
             <div class="audio-head-row"><span class="audio-name">MELLE</span><span class="audio-badge">Baseline</span></div>
-            <div class="audio-tag">deterministic AR</div>
+            <div class="audio-tag">fixed-variance Gaussian AR</div>
             <audio controls preload="none" src="./static/audio_new/melle/61-70970-0016_wav_pg_2.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
@@ -704,7 +701,7 @@
             <audio controls preload="none" src="./static/audio_new/belle/61-70970-0016_wav_pg_2.wav"></audio>
           </div>
           <div class="audio-cell is-ours">
-            <div class="audio-head-row"><span class="audio-name">BELLE Stream</span><span class="audio-badge">Ours</span></div>
+            <div class="audio-head-row"><span class="audio-name">BELLE-stream</span><span class="audio-badge">Ours</span></div>
             <div class="audio-tag">streaming variant</div>
             <audio controls preload="none" src="./static/audio_new/belle_stream/61-70970-0016_wav_pg_2.wav"></audio>
           </div>

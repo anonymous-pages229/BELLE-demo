@@ -311,7 +311,7 @@
       position: relative;
     }
     .figure::before {
-      content: "FIG.01";
+      content: attr(data-fig);
       position: absolute;
       top: 16px;
       left: 24px;
@@ -598,13 +598,17 @@
     <div class="container">
       <div class="section-head">
         <div class="section-num">02 · Method</div>
-        <h2 class="section-title">Data pipeline &amp; model architecture.</h2>
+        <h2 class="section-title">Model architecture.</h2>
         <p class="section-sub">Several realizations of each text provide the statistical support for estimating the variance; the Sampling Module predicts the four parameters of a Normal-Inverse-Gamma prior at every frame and samples the frame from it in a single pass.</p>
       </div>
 
-      <div class="figure">
-        <img src="belle.png" alt="BELLE: data pipeline and model architecture overview">
-        <p class="figure-cap"><b>FIG.01</b>&nbsp;&nbsp;Overview of BELLE. Several realizations of each text form the training targets; the AR backbone predicts the NIG parameters of each frame, which set both its location and its spread.</p>
+      <div class="figure" data-fig="FIG.01">
+        <img src="belle.png" alt="BELLE: model architecture and the evidential Sampling Module">
+        <p class="figure-cap"><b>FIG.01</b>&nbsp;&nbsp;Overview of BELLE. Left: the mel-based AR TTS architecture. Right: the Sampling Module, which predicts a Bayesian prior over the mean and variance of each frame from the hidden representation e<sub>t</sub> and samples the frame from it in three steps: an Inverse-Gamma draw of the variance, a Gaussian draw of the mean, and a Gaussian draw of the frame.</p>
+      </div>
+      <div class="figure" data-fig="FIG.02" style="margin-top: 48px;">
+        <img src="belle_stream.png" alt="BELLE-stream: interleaved text and mel-spectrogram chunks" style="max-width: 640px; margin: 28px auto 0;">
+        <p class="figure-cap"><b>FIG.02</b>&nbsp;&nbsp;BELLE-stream interleaves text and mel-spectrogram chunks as the input of the AR model under a causal mask, so speech is generated chunk by chunk while the text is still arriving. It uses the same Sampling Module as BELLE.</p>
       </div>
     </div>
   </section>
